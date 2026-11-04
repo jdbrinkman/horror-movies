@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Horror Movie Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>🩸 Horror Movie Dashboard</h1>
+    <p class="subtitle">
+      ~32K horror films from The Movie Database, 1950–2022.
+      Data: <a href="https://github.com/rfordatascience/tidytuesday/tree/main/data/2022/2022-11-01">TidyTuesday 2022-11-01</a>
+    </p>
+  </header>
+
+  <main>
+    <!-- FILTERS: every control here calls render() in app.js when changed -->
+    <section class="filters" aria-label="Filters">
+      <label>From
+        <select id="filter-year-from"></select>
+      </label>
+      <label>To
+        <select id="filter-year-to"></select>
+      </label>
+      <label>Sub-genre
+        <select id="filter-genre"></select>
+      </label>
+      <label>Language
+        <select id="filter-language"></select>
+      </label>
+      <label class="slider">Min votes (for ratings): <output id="min-votes-output">25</output>
+        <input id="filter-min-votes" type="range" min="0" max="500" step="5" value="25" />
+      </label>
+      <button id="reset" type="button">Reset</button>
+    </section>
+
+    <!-- KPI CARDS -->
+    <section class="kpis" aria-label="Key numbers">
+      <div class="card kpi"><span class="kpi-label">Movies</span><span class="kpi-value" id="kpi-count">–</span></div>
+      <div class="card kpi"><span class="kpi-label">Avg rating</span><span class="kpi-value" id="kpi-rating">–</span></div>
+      <div class="card kpi"><span class="kpi-label">Median runtime</span><span class="kpi-value" id="kpi-runtime">–</span></div>
+      <div class="card kpi"><span class="kpi-label">Total revenue</span><span class="kpi-value" id="kpi-revenue">–</span></div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="grid">
+      <div class="card"><h2>Movies released per year</h2><div class="chart-box"><canvas id="chart-per-year"></canvas></div></div>
+      <div class="card"><h2>Average rating per year</h2><div class="chart-box"><canvas id="chart-rating"></canvas></div></div>
+      <div class="card"><h2>Most common sub-genre combinations</h2><div class="chart-box"><canvas id="chart-genres"></canvas></div></div>
+      <div class="card"><h2>Runtime distribution (minutes)</h2><div class="chart-box"><canvas id="chart-runtime"></canvas></div></div>
+      <div class="card wide"><h2>Budget vs. revenue <small>(log scale, only movies with both reported)</small></h2><div class="chart-box tall"><canvas id="chart-money"></canvas></div></div>
+    </section>
+
+    <!-- TABLE -->
+    <section class="card">
+      <h2>Top-rated movies <small id="table-note"></small></h2>
+      <div class="table-wrap">
+        <table id="movie-table">
+          <thead>
+            <tr><th></th><th>Title</th><th>Year</th><th>Rating</th><th>Votes</th><th>Sub-genres</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>Built for learning. Fork it, break it, add a feature. 👻</footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
