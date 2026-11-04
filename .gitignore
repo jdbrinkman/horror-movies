@@ -1,3 +1,6 @@
+STUDENT_EXERCISE.md
 .DS_Store
 .claude/
 node_modules/
+.env
+.env.local

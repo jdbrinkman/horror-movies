@@ -60,6 +60,8 @@ python3 scripts/build_data.py
 GitHub → **Settings → Pages → Deploy from a branch → `main` / root**.
 Your dashboard will be live at `https://<your-username>.github.io/<repo-name>/`.
 
-## Contributing / student exercise
+## Contributing
 
-See **[STUDENT_EXERCISE.md](STUDENT_EXERCISE.md)** for the GitHub workflow and a menu of features to add.
+1. Create a branch: `git checkout -b feature/<short-name>`
+2. Make your change and test it in the browser (try the filters, including combinations with no results).
+3. Commit, push the branch, and open a pull request. The PR template will ask for a screenshot.
