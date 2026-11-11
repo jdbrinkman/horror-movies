@@ -6,6 +6,8 @@ const DATA_URL = "data/movies.json";
 const POSTER_BASE = "https://image.tmdb.org/t/p/w92"; // TMDB image host
 
 let allMovies = [];
+let shownIds = new Set(); // ids of the movies currently shown in the top-rated table
+let spinning = false;
 const charts = {}; // keep Chart.js instances so we can update (not recreate) them
 
 // ---------- Small helpers ----------
@@ -241,6 +243,7 @@ function cell(text, className) {
 
 function renderTable(rated) {
   const top = [...rated].sort((a, b) => b.rating - a.rating || b.votes - a.votes).slice(0, 15);
+  shownIds = new Set(top.map((m) => m.id)); // remembered so the random picker can skip these
   const tbody = document.querySelector("#movie-table tbody");
   tbody.replaceChildren();
   for (const m of top) {
@@ -264,6 +267,66 @@ function renderTable(rated) {
     tbody.append(tr);
   }
   $("table-note").textContent = top.length ? "" : "— no movies match these filters";
+}
+
+// ---------- Random movie picker ----------
+// Pool = movies matching the year / sub-genre / language filters, minus the ones already
+// in the table. The "min votes" slider is ignored on purpose, so unrated movies can win.
+function showPick(m) {
+  const box = $("picker-result");
+  box.replaceChildren();
+  if (!m) {
+    box.textContent = "No other movies match these filters. Try widening them.";
+    return;
+  }
+  const details = document.createElement("div");
+  const title = document.createElement("strong");
+  title.textContent = `${m.title} (${m.year})`;
+  const meta = document.createElement("div");
+  meta.className = "picker-meta";
+  const rating = m.votes ? `★ ${m.rating.toFixed(1)} from ${fmtInt(m.votes)} votes` : "No votes yet";
+  const runtime = m.runtime ? `${m.runtime} min` : "runtime unknown";
+  meta.textContent = `${rating} · ${runtime} · ${m.genres.join(", ") || "Horror"}`;
+  details.append(title, meta);
+  if (m.poster) {
+    const img = document.createElement("img");
+    img.src = POSTER_BASE + m.poster;
+    img.alt = `Poster for ${m.title}`;
+    box.append(img);
+  }
+  box.append(details);
+}
+
+function spin() {
+  if (spinning) return;
+  const pool = applyFilters(allMovies, readFilters()).filter((m) => !shownIds.has(m.id));
+  if (!pool.length) return showPick(null);
+
+  const pick = () => pool[Math.floor(Math.random() * pool.length)];
+  const winner = pick();
+  const box = $("picker-result");
+
+  // Respect people who turn animations off in their OS settings
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return showPick(winner);
+
+  // Flash random titles, slowing down each step, then land on the winner.
+  spinning = true;
+  $("spin").disabled = true;
+  box.classList.add("spinning");
+  const STEPS = 22;
+  let step = 0;
+  (function tick() {
+    if (step >= STEPS) {
+      box.classList.remove("spinning");
+      showPick(winner);
+      spinning = false;
+      $("spin").disabled = false;
+      return;
+    }
+    showPick(pick());
+    step++;
+    setTimeout(tick, 60 + step * step * 0.6); // 60ms at first, ~320ms at the end
+  })();
 }
 
 // ---------- Main render ----------
@@ -297,6 +360,7 @@ async function init() {
     return;
   }
   setupFilters();
+  $("spin").addEventListener("click", spin);
   render();
 }
 
